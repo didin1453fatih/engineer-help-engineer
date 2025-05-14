@@ -4,6 +4,27 @@ import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
+import {
+  BookUser,
+  CreditCard,
+  Globe,
+  Keyboard,
+  LogOut,
+  Menu,
+  Settings,
+  User,
+  Users,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export default async function AuthButton() {
   const supabase = await createClient();
@@ -16,14 +37,6 @@ export default async function AuthButton() {
     return (
       <>
         <div className="flex gap-4 items-center">
-          <div>
-            <Badge
-              variant={"default"}
-              className="font-normal pointer-events-none"
-            >
-              Please update .env.local file with anon key and url
-            </Badge>
-          </div>
           <div className="flex gap-2">
             <Button
               asChild
@@ -49,14 +62,60 @@ export default async function AuthButton() {
     );
   }
   return user ? (
-    <div className="flex items-center gap-4">
-      Hey, {user.email}!
-      <form action={signOutAction}>
-        <Button type="submit" variant={"outline"}>
-          Sign out
+    <>
+      <div className="flex items-center gap-4 hidden md:inline-flex">
+        <Button
+          type="submit"
+          variant={"ghost"}
+          className="hover:bg-accent transition-colors text-foreground/90"
+        >
+          <Globe height={17} />
+          <span>Global Opportunity</span>
         </Button>
-      </form>
-    </div>
+        <Button
+          type="submit"
+          variant={"ghost"}
+          className="hover:bg-accent transition-colors text-foreground/90"
+        >
+          <BookUser height={17} />
+          <span>My Opportunity</span>
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="submit" variant={"outline"}>
+              <User height={17} />
+              {user.email}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40 pt-1 pb-1">
+            <DropdownMenuLabel className="font-medium">
+              My Account
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <Settings height={17} />
+                <span className="ml-1">Settings</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={signOutAction}>
+                <LogOut height={17} />
+                <span className="ml-1">Log out</span>
+              </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="md:hidden">
+        <Button
+          type="submit"
+          variant={"outline"}
+          className="hover:bg-accent transition-colors text-foreground/90"
+        >
+          <Menu />
+        </Button>
+      </div>
+    </>
   ) : (
     <div className="flex gap-2">
       <Button asChild size="sm" variant={"outline"}>
