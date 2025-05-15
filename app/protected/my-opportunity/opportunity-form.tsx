@@ -36,9 +36,11 @@ import { useEffect, useState } from "react";
 import { Edit, Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { MyOpportunity } from "./data-table";
+import MultipleSelector, { Option } from "@/components/ui/multi-select";
 
 const formSchema = z.object({
   title: z.string().min(2).max(150),
+  skills: z.array(z.string()).min(1),
   company_name: z.string().min(2).max(150),
   link: z.string().min(2).max(150),
   status: z.string().min(2).max(150),
@@ -47,33 +49,35 @@ const formSchema = z.object({
 
 export function OpportunityForm({
   action,
-  data,
+  opportunity,
   isDrawerOpen,
   setIsDrawerOpen,
 }: {
   action: "new" | "update";
   isDrawerOpen: false | true;
-  data: MyOpportunity | null;
+  opportunity: MyOpportunity | null;
   setIsDrawerOpen: (newValue: boolean) => void;
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: data?.title,
-      company_name: data?.company_name,
-      link: data?.link,
-      status: data?.status,
-      note: data?.note,
+      title: opportunity?.title,
+      company_name: opportunity?.company_name,
+      link: opportunity?.link,
+      status: opportunity?.status,
+      note: opportunity?.note,
+      skills:opportunity?.skills
     },
   });
 
   useEffect(() => {
     if (isDrawerOpen) {
-      form.setValue("title", data?.title || "");
-      form.setValue("company_name", data?.company_name || "");
-      form.setValue("link", data?.link || "");
-      form.setValue("status", data?.status || "interested");
-      form.setValue("note", data?.note || "");
+      form.setValue("title", opportunity?.title || "");
+      form.setValue("company_name", opportunity?.company_name || "");
+      form.setValue("link", opportunity?.link || "");
+      form.setValue("status", opportunity?.status || "interested");
+      form.setValue("note", opportunity?.note || "");
+      form.setValue("skills", opportunity?.skills || []);
     }
   }, [isDrawerOpen]);
   const router = useRouter();
@@ -99,11 +103,27 @@ export function OpportunityForm({
             link: values.link,
             status: values.status,
             user_id: user.id,
+            note: values.note,
+            skills:values.skills
           },
         ]);
-        console.log("Submited new");
         router.refresh();
-      } else {
+      } else if (action == "update" && opportunity?.id) {
+        let { data, error } = await supabase
+          .from("my_opportunity")
+          .update({
+            title: values.title,
+            company_name: values.company_name,
+            link: values.link,
+            status: values.status,
+            note: values.note,
+            skills:values.skills
+          })
+          .eq("id", opportunity.id)
+          .select();
+        console.log(data);
+        console.log(error);
+        router.refresh();
       }
       console.log(values);
     } finally {
@@ -111,6 +131,14 @@ export function OpportunityForm({
       setIsDrawerOpen(false);
     }
   }
+
+  const skillsList = [
+    { value: "react", label: "React" },
+    { value: "angular", label: "Angular" },
+    { value: "vue", label: "Vue" },
+    { value: "svelte", label: "Svelte" },
+    { value: "ember", label: "Ember" },
+  ];
 
   return (
     <Drawer
@@ -148,6 +176,33 @@ export function OpportunityForm({
                           placeholder="Job Title"
                           {...field}
                           disabled={isSubmitting}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="skills"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Skills</FormLabel>
+                      <FormControl>
+                        <MultipleSelector
+                          value={skillsList.filter((skill) => field.value.includes(skill.value))}
+                          onChange={(options: Option[]) => {
+                            field.onChange(options.map((option) => option.value));
+                          }}
+                          defaultOptions={skillsList}
+                          placeholder="Select skills"
+                          creatable
+                          emptyIndicator={
+                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                              no results found.
+                            </p>
+                          }
                         />
                       </FormControl>
                       <FormMessage />

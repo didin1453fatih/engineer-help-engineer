@@ -31,7 +31,10 @@ import {
   Cog,
   Delete,
   Edit,
+  ExternalLink,
   Globe,
+  Link,
+  Link2,
   MoreHorizontal,
   Trash,
 } from "lucide-react";
@@ -52,17 +55,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 interface DataTableProps<MyOpportunity> {
   data: MyOpportunity[];
 }
 
 export interface MyOpportunity {
+  id: number;
   title: string;
   company_name: string;
   link: string;
   status: string;
   note: string;
+  skills: string[];
 }
 
 export function DataTable({ data }: DataTableProps<MyOpportunity>) {
@@ -83,22 +89,67 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
     {
       accessorKey: "title",
       header: "Title",
+      size: 610,
+    },
+    {
+      accessorKey: "skills",
+      header: "Skills",
+      size: 20,
+      cell: ({ row }) => {
+        return (
+          <>
+            {row.original.skills.map((skill) => (
+              <div className="pt-1 pr-1">
+                <Badge
+                  key={skill}
+                  className="font-medium rounded-md"
+                  variant={"outline"}
+                >
+                  {skill}
+                </Badge>
+              </div>
+            ))}
+          </>
+        );
+      },
     },
     {
       accessorKey: "company_name",
       header: "Company",
+      size: 10,
     },
     {
       accessorKey: "link",
-      header: "Link",
+      size: 10,
+      header: "🔗",
+      cell: ({ row }) => {
+        const my_opportunity = row.original;
+        return (
+          <>
+            <a href={my_opportunity.link} target="_blank">
+              <Button variant="link" className="h-8 p-0">
+                🔗
+              </Button>
+            </a>
+          </>
+        );
+      },
     },
     {
       accessorKey: "status",
+      size: 130,
       header: "Status",
+      cell: ({ row }) => {
+        return <Badge className="font-medium rounded-md">{row.original.status}</Badge>;
+      },
+      meta: {
+        textAlign: "text-center",
+      },
     },
     {
       accessorKey: "note",
       header: "Note",
+      size: 300,
     },
     {
       id: "actions",
@@ -187,7 +238,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
             onClick={() => {
               setIsDrawerOpen(true);
               setDrawerAction("new");
-              setSelectedMyOpportunity(null)
+              setSelectedMyOpportunity(null);
             }}
           >
             <span>🚀</span>
@@ -228,9 +279,14 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header, index) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      //   style={{ ...(columns[index].size && { width: `${header.getSize()}px` }) }}
+                      style={{ width: `${header.getSize()}px` }}
+                      className={`px-1 ${index == 0 ? "pl-4" : ""} ${[4, 2].indexOf(index) >= 0 ? "text-center" : ""}`}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -250,8 +306,11 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                  {row.getVisibleCells().map((cell, index) => (
+                    <TableCell
+                      key={cell.id}
+                      className={`px-1 ${index == 0 ? "pl-4" : ""} ${[4, 2].indexOf(index) >= 0 ? "text-center" : ""}`}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -341,7 +400,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
       </div>
       <OpportunityForm
         action={drawerAction}
-        data={selectedMyOpportunity}
+        opportunity={selectedMyOpportunity}
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
       />
