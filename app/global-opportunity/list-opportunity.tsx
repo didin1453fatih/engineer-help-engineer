@@ -1,3 +1,5 @@
+"use client"
+
 import {
   ArrowRight,
   Award,
@@ -31,7 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DetailOpportunity } from "./detail-opportunity";
-import { GlobalOpportunity } from "./main";
+import { GlobalOpportunity } from "./page";
 
 interface ListItem {
   icon: React.ReactNode;

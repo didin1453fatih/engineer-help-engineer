@@ -12,7 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Ban, Building, Dot, Heart, MapPin } from "lucide-react";
-import { GlobalOpportunity } from "./main";
+import { GlobalOpportunity } from "./page";
 
 export function DetailOpportunity({
     open,
