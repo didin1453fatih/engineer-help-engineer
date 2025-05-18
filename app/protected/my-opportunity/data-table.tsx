@@ -99,7 +99,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
         return (
           <>
             {row.original.skills.map((skill) => (
-              <div className="pt-1 pr-1">
+              <div className="pt-1 pr-1" key={skill}>
                 <Badge
                   key={skill}
                   className="font-medium rounded-md"

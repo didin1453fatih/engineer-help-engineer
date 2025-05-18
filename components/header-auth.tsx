@@ -82,9 +82,9 @@ export default async function AuthButton() {
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="submit" variant={"outline"}>
+            <Button type="submit" variant={"outline"} className="h-9 pl-2 pr-3">
               <User height={17} />
-              {user.email}
+              Account
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40 pt-1 pb-1">
