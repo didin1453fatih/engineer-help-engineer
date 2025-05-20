@@ -33,10 +33,15 @@ import {
 } from "@/components/ui/drawer";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
-import { Edit, Loader2 } from "lucide-react";
+import { ChevronsUpDown, Edit, Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { MyOpportunity } from "./data-table";
 import MultipleSelector, { Option } from "@/components/ui/multi-select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const formSchema = z.object({
   title: z.string().min(2).max(150),
@@ -66,7 +71,7 @@ export function OpportunityForm({
       link: opportunity?.link,
       status: opportunity?.status,
       note: opportunity?.note,
-      skills:opportunity?.skills
+      skills: opportunity?.skills,
     },
   });
 
@@ -82,6 +87,7 @@ export function OpportunityForm({
   }, [isDrawerOpen]);
   const router = useRouter();
 
+  const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -104,7 +110,7 @@ export function OpportunityForm({
             status: values.status,
             user_id: user.id,
             note: values.note,
-            skills:values.skills
+            skills: values.skills,
           },
         ]);
         router.refresh();
@@ -117,7 +123,7 @@ export function OpportunityForm({
             link: values.link,
             status: values.status,
             note: values.note,
-            skills:values.skills
+            skills: values.skills,
           })
           .eq("id", opportunity.id)
           .select();
@@ -147,7 +153,7 @@ export function OpportunityForm({
       onOpenChange={setIsDrawerOpen}
     >
       <DrawerContent>
-        <div className="mx-auto w-full  w-[500px] px-2 py-1">
+        <div className="mx-auto w-full  w-[500px] px-2 py-1 overflow-y-auto scroll-smooth">
           <DrawerHeader>
             <DrawerTitle>
               🚀{" "}
@@ -159,7 +165,7 @@ export function OpportunityForm({
               Save new opportunity in one place
             </DrawerDescription>
           </DrawerHeader>
-          <div className="p-4 pb-0 w-[400px]">
+          <div className="pl-4 pr-4 pb-4 pb-0 w-[400px]">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -191,9 +197,13 @@ export function OpportunityForm({
                       <FormLabel>Skills</FormLabel>
                       <FormControl>
                         <MultipleSelector
-                          value={skillsList.filter((skill) => field.value.includes(skill.value))}
+                          value={skillsList.filter((skill) =>
+                            field.value.includes(skill.value)
+                          )}
                           onChange={(options: Option[]) => {
-                            field.onChange(options.map((option) => option.value));
+                            field.onChange(
+                              options.map((option) => option.value)
+                            );
                           }}
                           defaultOptions={skillsList}
                           placeholder="Select skills"
@@ -281,10 +291,41 @@ export function OpportunityForm({
 
                 <FormField
                   control={form.control}
+                  name="skills"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Private Tags</FormLabel>
+                      <FormControl>
+                        <MultipleSelector
+                          value={skillsList.filter((skill) =>
+                            field.value.includes(skill.value)
+                          )}
+                          onChange={(options: Option[]) => {
+                            field.onChange(
+                              options.map((option) => option.value)
+                            );
+                          }}
+                          defaultOptions={skillsList}
+                          placeholder="Select skills"
+                          creatable
+                          emptyIndicator={
+                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                              no results found.
+                            </p>
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="note"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Note</FormLabel>
+                      <FormLabel>Private Note</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Input some note"
@@ -297,7 +338,165 @@ export function OpportunityForm({
                   )}
                 />
 
-                <div className="flex gap-4">
+                <Collapsible
+                  open={isOpen}
+                  onOpenChange={setIsOpen}
+                  className="w-[350px] space-y-2"
+                >
+                  <div className="flex items-center justify-between space-x-4 px-2 pt-3 pb-3">
+                    <h4 className="text-sm font-semibold">
+                      Additional Columns
+                    </h4>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="w-9 p-0">
+                        <ChevronsUpDown className="h-4 w-4" />
+                        <span className="sr-only">Toggle</span>
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
+                  <CollapsibleContent className="space-y-2">
+                    <FormField
+                      control={form.control}
+                      name="skills"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Locations</FormLabel>
+                          <FormControl>
+                            <MultipleSelector
+                              value={skillsList.filter((skill) =>
+                                field.value.includes(skill.value)
+                              )}
+                              onChange={(options: Option[]) => {
+                                field.onChange(
+                                  options.map((option) => option.value)
+                                );
+                              }}
+                              defaultOptions={skillsList}
+                              placeholder="Select skills"
+                              creatable
+                              emptyIndicator={
+                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                  no results found.
+                                </p>
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="link"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Salary Min</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input salary min"
+                              {...field}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="link"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Salary Max</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input salary max"
+                              {...field}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="link"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Salary Cycle</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input salary cycle"
+                              {...field}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="link"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Salary Currency</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input currency"
+                              {...field}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="note"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Job Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Input job description"
+                              {...field}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="link"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Published At</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input published at"
+                              {...field}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <div className="flex gap-4 pt-3 pb-5">
                   <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

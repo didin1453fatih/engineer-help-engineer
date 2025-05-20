@@ -15,12 +15,12 @@ export default async function DemoPage() {
   return (
     <div className="">
       <h1
-        className="text-2xl pt-5 font-semibold leading-tight tracking-tighter sm:text-3xl md:text-4xl lg:leading-[1.1]"
+        className="text-2xl pt-5 mt-3 font-semibold leading-tight tracking-tighter sm:text-3xl md:text-4xl lg:leading-[1.1]"
       >
         My Opportunity
       </h1>
       <p
-        className="pt-1 max-w-2xl text-base font-light text-foreground sm:text-lg"
+        className="pt-1 max-w-2xl pb-2 text-base font-light text-foreground sm:text-lg"
       >
         Organize all of you opportunity at one place
       </p>
