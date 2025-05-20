@@ -30,13 +30,17 @@ import {
   ChevronsRight,
   Cog,
   Delete,
+  Dot,
   Edit,
   ExternalLink,
   Globe,
+  Heart,
   Link,
   Link2,
+  MapPin,
   MoreHorizontal,
   Trash,
+  X,
 } from "lucide-react";
 import { OpportunityForm } from "./opportunity-form";
 import {
@@ -89,58 +93,79 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
     {
       accessorKey: "title",
       header: "Title",
-      size: 610,
-    },
-    {
-      accessorKey: "skills",
-      header: "Skills",
-      size: 20,
+      size: 710,
       cell: ({ row }) => {
         return (
-          <>
-            {row.original.skills.map((skill) => (
-              <div className="pt-1 pr-1" key={skill}>
-                <Badge
-                  key={skill}
-                  className="font-medium rounded-md"
-                  variant={"outline"}
-                >
-                  {skill}
-                </Badge>
+          <React.Fragment>
+            <div
+              className="mb-3 w-full flex flex-col items-start gap-0 rounded-lg pl-2 pr-2 pb-3 pl-0 text-left text-sm transition-all "
+              onClick={() => {}}
+            >
+              <div
+                className="ml-auto text-xs text-muted-foreground w-full text-right pt-2"
+              >
+                3 days ago
               </div>
-            ))}
-          </>
-        );
-      },
-    },
-    {
-      accessorKey: "company_name",
-      header: "Company",
-      size: 10,
-    },
-    {
-      accessorKey: "link",
-      size: 10,
-      header: "🔗",
-      cell: ({ row }) => {
-        const my_opportunity = row.original;
-        return (
-          <>
-            <a href={my_opportunity.link} target="_blank">
-              <Button variant="link" className="h-8 p-0">
-                🔗
-              </Button>
-            </a>
-          </>
+              <div className="flex w-full flex-col gap-1">
+                <div className="flex items-top">
+                  <div className="items-center gap-2">
+                    <div className="flex">
+                      <div className="font-semibold leading-tight">
+                        Senior Ruby on Rails Developer
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-medium">Google</div>
+                    </div>
+                    <div className="line-clamp-2 text-xs text-muted-foreground">
+                      We build high tech Technology about future
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 mt-2">
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                  <MapPin height={13} />
+                  Jakarta
+                </div>
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                  Sydney
+                </div>
+                <Dot className="m-0" />
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                  $100 - $200 USD
+                </div>
+                <Dot className="m-0" />
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                  VueJs
+                </div>
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                  ReactJs
+                </div>
+              </div>
+              <div className="flex items-center mt-2">
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                  <Link2 height={13} />
+                  <a href="https://www.google.com" target="_blank">
+                    https://physio.snaphunt.com/job/T8SSTEXNMS
+                  </a>
+                </div>
+              </div>
+            </div>
+          </React.Fragment>
         );
       },
     },
     {
       accessorKey: "status",
       size: 130,
-      header: "Status",
+      header: "Tags",
       cell: ({ row }) => {
-        return <Badge className="font-medium rounded-md">{row.original.status}</Badge>;
+        return (
+          <Badge variant={"default"} className="font-medium rounded-md">
+            {row.original.status}
+          </Badge>
+        );
       },
       meta: {
         textAlign: "text-center",
@@ -149,11 +174,27 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
     {
       accessorKey: "note",
       header: "Note",
-      size: 300,
+      size: 200,
+      cell: ({ row }) => {
+        return (
+          <div className="line-clamp-2 px-2 text-xs text-muted-foreground">
+            {row.original.note}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "company_name",
+      header: "Submited At",
+      size: 130,
+      cell: ({ row }) => {
+        return <div className="text-xs text-muted-foreground">22-10-2023</div>;
+      },
     },
     {
       id: "actions",
-      header: "Action",
+      header: "",
+      size: 60,
       cell: ({ row }) => {
         const my_opportunity = row.original;
         return (
@@ -283,9 +324,13 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                   return (
                     <TableHead
                       key={header.id}
-                      //   style={{ ...(columns[index].size && { width: `${header.getSize()}px` }) }}
-                      style={{ width: `${header.getSize()}px` }}
-                      className={`px-1 ${index == 0 ? "pl-4" : ""} ${[4, 2].indexOf(index) >= 0 ? "text-center" : ""}`}
+                      style={{
+                        ...(columns[index].size && {
+                          width: `${header.getSize()}px`,
+                        }),
+                      }}
+                      //   style={{ width: `${header.getSize()}px` }}
+                      className={`px-1 border-r ${index == 0 ? "pl-6" : ""} ${[1, 2, 3, 4].indexOf(index) >= 0 ? "text-center" : ""}`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -309,7 +354,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                   {row.getVisibleCells().map((cell, index) => (
                     <TableCell
                       key={cell.id}
-                      className={`px-1 ${index == 0 ? "pl-4" : ""} ${[4, 2].indexOf(index) >= 0 ? "text-center" : ""}`}
+                      className={`py-0 px-1 border-r ${index == 0 ? "pl-6" : ""} ${[1, 3, 4].indexOf(index) >= 0 ? "text-center" : ""}`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

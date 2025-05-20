@@ -15,7 +15,7 @@ export default async function DemoPage() {
   return (
     <div className="">
       <h1
-        className="text-2xl font-semibold leading-tight tracking-tighter sm:text-3xl md:text-4xl lg:leading-[1.1]"
+        className="text-2xl pt-5 font-semibold leading-tight tracking-tighter sm:text-3xl md:text-4xl lg:leading-[1.1]"
       >
         My Opportunity
       </h1>

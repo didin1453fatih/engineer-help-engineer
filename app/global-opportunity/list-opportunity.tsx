@@ -12,6 +12,7 @@ import {
   HeartHandshake,
   Leaf,
   Lightbulb,
+  Link2,
   MapPin,
   Pin,
   Save,
@@ -223,6 +224,14 @@ const List2 = ({
                     ReactJs
                   </div>
                 </div>
+                <div className="flex items-center">
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                  <Link2 height={13} />
+                  <a href="https://www.google.com" target="_blank">
+                    https://physio.snaphunt.com/job/T8SSTEXNMS
+                  </a>
+                </div>
+              </div>                
               </button>
             </React.Fragment>
           ))}

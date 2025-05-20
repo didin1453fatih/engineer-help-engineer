@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Ban, Building, Dot, Heart, MapPin } from "lucide-react";
+import { Ban, Building, Dot, Heart, Link2, MapPin } from "lucide-react";
 import { GlobalOpportunity } from "./page";
 
 export function DetailOpportunity({
@@ -57,6 +57,14 @@ export function DetailOpportunity({
               ReactJs
             </div>
           </div>
+          <div className="flex items-center mt-2">
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                  <Link2 height={13} />
+                  <a href="https://www.google.com" target="_blank">
+                    https://physio.snaphunt.com/job/T8SSTEXNMS
+                  </a>
+                </div>
+              </div>          
           <SheetDescription className="pt-5">
             Air Traffic Control for Warehouses We make software for warehouses
             and logistics teams to save time and money managing docks, gates,
