@@ -11,6 +11,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { formatDistanceToNow } from "date-fns";
 
 import {
   Table,
@@ -60,6 +61,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Toaster } from "@/components/ui/toaster";
 
 interface DataTableProps<MyOpportunity> {
   data: MyOpportunity[];
@@ -69,10 +71,21 @@ export interface MyOpportunity {
   id: number;
   title: string;
   company_name: string;
-  link: string;
+  source: string;
   status: string;
   note: string;
   skills: string[];
+  locations: string[];
+  salary_min: number;
+  salary_max: number;
+  currency: string;
+  salary_cycle: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string;
+  tags: string[];
+  description: string;
+  submitted_at: string;
 }
 
 export function DataTable({ data }: DataTableProps<MyOpportunity>) {
@@ -95,59 +108,98 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
       header: "Title",
       size: 710,
       cell: ({ row }) => {
+        const my_opportunity = row.original;
         return (
           <React.Fragment>
             <div
               className="mb-3 w-full flex flex-col items-start gap-0 rounded-lg pl-2 pr-2 pb-3 pl-0 text-left text-sm transition-all "
               onClick={() => {}}
             >
-              <div
-                className="ml-auto text-xs text-muted-foreground w-full text-right pt-2"
-              >
-                3 days ago
+              <div className="ml-auto text-xs text-muted-foreground w-full text-right pt-2">
+                {my_opportunity.published_at
+                  ? formatDistanceToNow(new Date(my_opportunity.published_at), {
+                      addSuffix: true,
+                    })
+                  : formatDistanceToNow(new Date(my_opportunity.created_at), {
+                      addSuffix: true,
+                    })}
               </div>
               <div className="flex w-full flex-col gap-1">
                 <div className="flex items-top">
                   <div className="items-center gap-2">
                     <div className="flex">
                       <div className="font-semibold leading-tight">
-                        Senior Ruby on Rails Developer
+                        {my_opportunity.title}
                       </div>
                     </div>
-                    <div>
-                      <div className="text-xs font-medium">Google</div>
+                    <div className="pt-1">
+                      <div className="text-xs font-medium">
+                        {my_opportunity.company_name}{" "}
+                      </div>
                     </div>
-                    <div className="line-clamp-2 text-xs text-muted-foreground">
-                      We build high tech Technology about future
+                    <div className="line-clamp-2 text-xs text-muted-foreground pt-1">
+                      Description :
+                      {my_opportunity.description
+                        ? my_opportunity.description
+                        : " No description"}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-1 mt-2">
-                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                  <MapPin height={13} />
-                  Jakarta
-                </div>
-                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                  Sydney
-                </div>
+                {my_opportunity.locations.length > 0 ? (
+                  my_opportunity.locations.map((location, index) => (
+                    <div
+                      key={index}
+                      className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    >
+                      <MapPin height={13} />
+                      {location}
+                    </div>
+                  ))
+                ) : (
+                  <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                    <MapPin height={13} />
+                    No location
+                  </div>
+                )}
                 <Dot className="m-0" />
-                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                  $100 - $200 USD
-                </div>
+                {my_opportunity.salary_min && my_opportunity.salary_max ? (
+                  <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                    {my_opportunity.salary_min} - {my_opportunity.salary_max}{" "}
+                    {my_opportunity.currency}
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                    No salary range
+                  </div>
+                )}
                 <Dot className="m-0" />
-                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                  VueJs
-                </div>
-                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
-                  ReactJs
-                </div>
+                {my_opportunity.skills.length > 0 ? (
+                  my_opportunity.skills.map((skill, index) => (
+                    <div
+                      key={index}
+                      className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    >
+                      {skill}
+                    </div>
+                  ))
+                ) : (
+                  <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                    No skills
+                  </div>
+                )}
               </div>
               <div className="flex items-center mt-2">
-                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+                <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
                   <Link2 height={13} />
-                  <a href="https://www.google.com" target="_blank">
-                    https://physio.snaphunt.com/job/T8SSTEXNMS
+                  <a
+                    href={my_opportunity.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    {my_opportunity.source}
                   </a>
                 </div>
               </div>
@@ -159,12 +211,74 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
     {
       accessorKey: "status",
       size: 130,
-      header: "Tags",
+      header: "Status & Tags",
       cell: ({ row }) => {
         return (
-          <Badge variant={"default"} className="font-medium rounded-md">
-            {row.original.status}
-          </Badge>
+          <>
+            <Badge
+              variant={"default"}
+              className={`font-medium rounded-md ${
+                row.original.status === "interested"
+                  ? "bg-green-100 text-green-800 hover:bg-green-100"
+                  : row.original.status === "preparing"
+                    ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                    : row.original.status === "applied"
+                      ? "bg-indigo-100 text-indigo-800 hover:bg-indigo-100"
+                      : row.original.status === "interview"
+                        ? "bg-purple-100 text-purple-800 hover:bg-purple-100"
+                        : row.original.status === "waiting_result"
+                          ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
+                          : "bg-red-100 text-red-800 hover:bg-red-100" // rejected
+              }`}
+            >
+              {row.original.status === "interested" && (
+                <>
+                  Interested
+                  <span className="pl-2">🌱</span>
+                </>
+              )}
+              {row.original.status === "preparing" && (
+                <>
+                  Preparing
+                  <span className="pl-2">📚</span>
+                </>
+              )}
+              {row.original.status === "applied" && (
+                <>
+                  Applied
+                  <span className="pl-2">📨</span>
+                </>
+              )}
+              {row.original.status === "interview" && (
+                <>
+                  Interview
+                  <span className="pl-2">💼</span>
+                </>
+              )}
+              {row.original.status === "waiting_result" && (
+                <>
+                  Waiting Result
+                  <span className="pl-2">⏳</span>
+                </>
+              )}
+              {row.original.status === "rejected" && (
+                <>
+                  Rejected
+                  <span className="pl-2">❌</span>
+                </>
+              )}
+            </Badge>
+            <div className="flex items-center gap-1 mt-2">
+              {row.original.tags.map((tag, index) => (
+                <div
+                  key={index}
+                  className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2  bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                >
+                  {tag}
+                </div>
+              ))}
+            </div>
+          </>
         );
       },
       meta: {
@@ -184,11 +298,19 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
       },
     },
     {
-      accessorKey: "company_name",
+      accessorKey: "submitted_at",
       header: "Submited At",
       size: 130,
       cell: ({ row }) => {
-        return <div className="text-xs text-muted-foreground">22-10-2023</div>;
+        return (
+          <div className="text-xs text-muted-foreground">
+            {row.original.submitted_at
+              ? formatDistanceToNow(new Date(row.original.submitted_at), {
+                  addSuffix: true,
+                })
+              : "Not submitted yet"}
+          </div>
+        );
       },
     },
     {
@@ -315,7 +437,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
           </DropdownMenu>
         </div>
       </div>
-      <div className="rounded-md border w-full ">
+      <div className="rounded-md border w-full">
         <Table className="w-full table-auto">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -377,7 +499,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between px-2 pt-3">
+      <div className="flex items-center justify-between px-2 pt-3 pb-4">
         <div className="flex items-center space-x-2">
           <p className="text-sm ">Rows per page</p>
           <Select
@@ -449,6 +571,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
       />
+      <Toaster />
     </div>
   );
 }

@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { format } from "date-fns";
 import {
   Drawer,
   DrawerClose,
@@ -32,8 +33,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { createClient } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
-import { ChevronsUpDown, Edit, Loader2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { CalendarIcon, ChevronsUpDown, Edit, Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { MyOpportunity } from "./data-table";
 import MultipleSelector, { Option } from "@/components/ui/multi-select";
@@ -42,14 +43,32 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Toast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   title: z.string().min(2).max(150),
   skills: z.array(z.string()).min(1),
   company_name: z.string().min(2).max(150),
-  link: z.string().min(2).max(150),
+  source: z.string().min(2).max(150),
   status: z.string().min(2).max(150),
-  note: z.string().min(0).max(150),
+  note: z.string().min(0).max(150).optional(),
+  salary_min: z.number().min(0).max(1000000).optional(),
+  salary_max: z.number().min(0).max(1000000).optional(),
+  salary_cycle: z.string().min(0).max(150).optional(),
+  salary_currency: z.string().min(0).max(150).optional(),
+  locations: z.array(z.string()).optional(),
+  published_at: z.date().optional(),
+  submitted_at: z.date().optional(),
+  job_description: z.string().min(0).max(150).optional(),
+  tags: z.array(z.string()).optional(),
 });
 
 export function OpportunityForm({
@@ -68,7 +87,7 @@ export function OpportunityForm({
     defaultValues: {
       title: opportunity?.title,
       company_name: opportunity?.company_name,
-      link: opportunity?.link,
+      source: opportunity?.source,
       status: opportunity?.status,
       note: opportunity?.note,
       skills: opportunity?.skills,
@@ -79,7 +98,7 @@ export function OpportunityForm({
     if (isDrawerOpen) {
       form.setValue("title", opportunity?.title || "");
       form.setValue("company_name", opportunity?.company_name || "");
-      form.setValue("link", opportunity?.link || "");
+      form.setValue("source", opportunity?.source || "");
       form.setValue("status", opportunity?.status || "interested");
       form.setValue("note", opportunity?.note || "");
       form.setValue("skills", opportunity?.skills || []);
@@ -89,6 +108,8 @@ export function OpportunityForm({
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
@@ -106,13 +127,38 @@ export function OpportunityForm({
           {
             title: values.title,
             company_name: values.company_name,
-            link: values.link,
+            source: values.source,
             status: values.status,
             user_id: user.id,
             note: values.note,
             skills: values.skills,
+            salary_min: values.salary_min,
+            salary_max: values.salary_max,
+            salary_cycle: values.salary_cycle,
+            salary_currency: values.salary_currency,
+            locations: values.locations || [],
+            published_at: values.published_at,
+            submitted_at: values.submitted_at,
+            job_description: values.job_description,
+            tags: values.tags || [],
           },
         ]);
+        console.log(data);
+        console.log(error);
+        // router.refresh();
+        if (error) {
+          console.log(error);
+          toast({
+            className: cn(
+              'top-0 right-0 flex fixed md:max-w-[420px]'
+            ),
+            variant: "destructive",
+            title: "Error",
+            description: error.message,
+          });
+          return;
+        }
+        setIsDrawerOpen(false);
         router.refresh();
       } else if (action == "update" && opportunity?.id) {
         let { data, error } = await supabase
@@ -120,10 +166,20 @@ export function OpportunityForm({
           .update({
             title: values.title,
             company_name: values.company_name,
-            link: values.link,
+            source: values.source,
             status: values.status,
+            user_id: user.id,
             note: values.note,
             skills: values.skills,
+            salary_min: values.salary_min,
+            salary_max: values.salary_max,
+            salary_cycle: values.salary_cycle,
+            salary_currency: values.salary_currency,
+            locations: values.locations || [],
+            published_at: values.published_at,
+            submitted_at: values.submitted_at,
+            job_description: values.job_description,
+            tags: values.tags || [],
           })
           .eq("id", opportunity.id)
           .select();
@@ -134,7 +190,6 @@ export function OpportunityForm({
       console.log(values);
     } finally {
       setIsSubmitting(false);
-      setIsDrawerOpen(false);
     }
   }
 
@@ -197,17 +252,21 @@ export function OpportunityForm({
                       <FormLabel>Skills</FormLabel>
                       <FormControl>
                         <MultipleSelector
-                          value={skillsList.filter((skill) =>
-                            field.value.includes(skill.value)
-                          )}
+                          value={field.value.map((val) => {
+                            const existingSkill = skillsList.find(
+                              (skill) => skill.value === val
+                            );
+                            return existingSkill || { value: val, label: val };
+                          })}
                           onChange={(options: Option[]) => {
                             field.onChange(
                               options.map((option) => option.value)
                             );
+                            console.log(options);
                           }}
                           defaultOptions={skillsList}
-                          placeholder="Select skills"
-                          creatable
+                          placeholder="Select / Add skills"
+                          creatable={true}
                           emptyIndicator={
                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                               no results found.
@@ -239,13 +298,13 @@ export function OpportunityForm({
                 />
                 <FormField
                   control={form.control}
-                  name="link"
+                  name="source"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Link</FormLabel>
+                      <FormLabel>Source</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Url link to job source"
+                          placeholder="Source"
                           {...field}
                           disabled={isSubmitting}
                         />
@@ -272,15 +331,15 @@ export function OpportunityForm({
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="interested">
-                              Interested
+                            Interested <span className="ml-2">🌱</span>
                             </SelectItem>
-                            <SelectItem value="preparing">Preparing</SelectItem>
-                            <SelectItem value="applied">Applied</SelectItem>
-                            <SelectItem value="interview">Interview</SelectItem>
+                            <SelectItem value="preparing">Preparing <span className="ml-2">📚</span></SelectItem>
+                            <SelectItem value="applied">Applied <span className="ml-2">📨</span></SelectItem>
+                            <SelectItem value="interview">Interview <span className="ml-2">💼</span></SelectItem>
                             <SelectItem value="waiting_result">
-                              Waiting Result
+                            Waiting Result <span className="ml-2">⏳</span>
                             </SelectItem>
-                            <SelectItem value="rejected">Rejected</SelectItem>
+                            <SelectItem value="rejected">Rejected <span className="ml-2">❌</span></SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -291,22 +350,25 @@ export function OpportunityForm({
 
                 <FormField
                   control={form.control}
-                  name="skills"
+                  name="tags"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Private Tags</FormLabel>
                       <FormControl>
                         <MultipleSelector
-                          value={skillsList.filter((skill) =>
-                            field.value.includes(skill.value)
-                          )}
+                          value={field?.value?.map((val) => {
+                            const existingSkill = skillsList.find(
+                              (skill) => skill.value === val
+                            );
+                            return existingSkill || { value: val, label: val };
+                          })}
                           onChange={(options: Option[]) => {
                             field.onChange(
                               options.map((option) => option.value)
                             );
                           }}
-                          defaultOptions={skillsList}
-                          placeholder="Select skills"
+                          defaultOptions={[]}
+                          placeholder="Add tags"
                           creatable
                           emptyIndicator={
                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -388,7 +450,7 @@ export function OpportunityForm({
 
                     <FormField
                       control={form.control}
-                      name="link"
+                      name="salary_min"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Salary Min</FormLabel>
@@ -406,7 +468,7 @@ export function OpportunityForm({
 
                     <FormField
                       control={form.control}
-                      name="link"
+                      name="salary_max"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Salary Max</FormLabel>
@@ -424,7 +486,7 @@ export function OpportunityForm({
 
                     <FormField
                       control={form.control}
-                      name="link"
+                      name="salary_cycle"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Salary Cycle</FormLabel>
@@ -442,7 +504,7 @@ export function OpportunityForm({
 
                     <FormField
                       control={form.control}
-                      name="link"
+                      name="salary_currency"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Salary Currency</FormLabel>
@@ -460,7 +522,7 @@ export function OpportunityForm({
 
                     <FormField
                       control={form.control}
-                      name="note"
+                      name="job_description"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Job Description</FormLabel>
@@ -478,17 +540,48 @@ export function OpportunityForm({
 
                     <FormField
                       control={form.control}
-                      name="link"
+                      name="published_at"
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Published At</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Input published at"
-                              {...field}
-                              disabled={isSubmitting}
-                            />
-                          </FormControl>
+                        <FormItem className="flex flex-col pt-1">
+                          <FormLabel>Published Date</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-[240px] pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "dd/MM/yyyy")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                  date > new Date() ||
+                                  date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormDescription>
+                            Published date of the job posting
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
