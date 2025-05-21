@@ -42,7 +42,7 @@ export default function RootLayout({
           <main className="min-h-screen flex flex-col items-center">
             <div className="flex-1 w-full flex flex-col gap-0 items-center">
               <nav className="w-full flex justify-center border-b h-16">
-                <div className="w-full max-w-6xl flex justify-between items-center p-3 px-5 text-sm">
+                <div className="w-full max-w-7xl flex justify-between items-center sm:px-7 px-3 text-sm">
                   <div className="flex gap-5 items-center font-semibold">
                   <Image src={`/engineer_help_engineer_text_only.png`} alt="logo"  height="54" width="190" />
 
@@ -51,7 +51,7 @@ export default function RootLayout({
                 </div>
               </nav>
               {/* <div className="flex flex-col gap-20 max-w-5xl p-5"> */}
-              <div className="mb-auto w-full max-w-[75rem] container mx-auto">
+              <div className="mb-auto w-full max-w-7xl sm:px-7 px-3 mx-auto">
                 {children}
               </div>
 

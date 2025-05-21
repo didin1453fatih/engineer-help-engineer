@@ -147,7 +147,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1 mt-2">
+              <div className="flex flex-wrap items-center gap-1 mt-2">
                 {my_opportunity.locations.length > 0 ? (
                   my_opportunity.locations.map((location, index) => (
                     <div
@@ -200,7 +200,9 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                     rel="noopener noreferrer"
                     className="hover:underline"
                   >
-                    {my_opportunity.source}
+                    {my_opportunity.source.length > 30
+                      ? my_opportunity.source.substring(0, 30) + "..."
+                      : my_opportunity.source}
                   </a>
                 </div>
               </div>
@@ -446,9 +448,9 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between px-2 pt-3 pb-4">
+      <div className="flex items-center justify-between pt-3 pb-4">
         <div className="flex items-center space-x-2">
-          <p className="text-sm ">Rows per page</p>
+          <p className="text-sm hidden sm:block">Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
