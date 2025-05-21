@@ -62,6 +62,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Toaster } from "@/components/ui/toaster";
+import { StatusBadge } from "./status-badge";
 
 interface DataTableProps<MyOpportunity> {
   data: MyOpportunity[];
@@ -215,59 +216,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
       cell: ({ row }) => {
         return (
           <>
-            <Badge
-              variant={"default"}
-              className={`font-medium rounded-md ${
-                row.original.status === "interested"
-                  ? "bg-green-100 text-green-800 hover:bg-green-100"
-                  : row.original.status === "preparing"
-                    ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                    : row.original.status === "applied"
-                      ? "bg-indigo-100 text-indigo-800 hover:bg-indigo-100"
-                      : row.original.status === "interview"
-                        ? "bg-purple-100 text-purple-800 hover:bg-purple-100"
-                        : row.original.status === "waiting_result"
-                          ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
-                          : "bg-red-100 text-red-800 hover:bg-red-100" // rejected
-              }`}
-            >
-              {row.original.status === "interested" && (
-                <>
-                  Interested
-                  <span className="pl-2">🌱</span>
-                </>
-              )}
-              {row.original.status === "preparing" && (
-                <>
-                  Preparing
-                  <span className="pl-2">📚</span>
-                </>
-              )}
-              {row.original.status === "applied" && (
-                <>
-                  Applied
-                  <span className="pl-2">📨</span>
-                </>
-              )}
-              {row.original.status === "interview" && (
-                <>
-                  Interview
-                  <span className="pl-2">💼</span>
-                </>
-              )}
-              {row.original.status === "waiting_result" && (
-                <>
-                  Waiting Result
-                  <span className="pl-2">⏳</span>
-                </>
-              )}
-              {row.original.status === "rejected" && (
-                <>
-                  Rejected
-                  <span className="pl-2">❌</span>
-                </>
-              )}
-            </Badge>
+            <StatusBadge status={row.original.status} />
             <div className="flex items-center gap-1 mt-2">
               {row.original.tags.map((tag, index) => (
                 <div
@@ -308,7 +257,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
               ? formatDistanceToNow(new Date(row.original.submitted_at), {
                   addSuffix: true,
                 })
-              : "Not submitted yet"}
+              : "No submission"}
           </div>
         );
       },
@@ -381,8 +330,6 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between md:pb-0 pb-2">
-        {/* <div className="flex flex-col md:flex-row gap-y-4 md:gap-y-0 md:items-center py-4 space-y-4 md:space-y-0">       */}
-
         <div className="flex h-[60px] items-center ">
           <Input
             placeholder="Filter title..."

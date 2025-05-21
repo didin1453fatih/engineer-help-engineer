@@ -149,9 +149,7 @@ export function OpportunityForm({
         if (error) {
           console.log(error);
           toast({
-            className: cn(
-              'top-0 right-0 flex fixed md:max-w-[420px]'
-            ),
+            className: cn("top-0 right-0 flex fixed md:max-w-[420px]"),
             variant: "destructive",
             title: "Error",
             description: error.message,
@@ -207,8 +205,8 @@ export function OpportunityForm({
       open={isDrawerOpen}
       onOpenChange={setIsDrawerOpen}
     >
-      <DrawerContent>
-        <div className="mx-auto w-full  w-[500px] px-2 py-1 overflow-y-auto scroll-smooth">
+      <DrawerContent className="w-full sm:w-[415px] overflow-y-auto overflow-x-hidden">
+        <div className="sm:px-2 py-1">
           <DrawerHeader>
             <DrawerTitle>
               🚀{" "}
@@ -220,7 +218,7 @@ export function OpportunityForm({
               Save new opportunity in one place
             </DrawerDescription>
           </DrawerHeader>
-          <div className="pl-4 pr-4 pb-4 pb-0 w-[400px]">
+          <div className="pl-4 pr-4 pb-4 pb-0">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -326,20 +324,28 @@ export function OpportunityForm({
                           onValueChange={field.onChange}
                           disabled={isSubmitting}
                         >
-                          <SelectTrigger className="w-[180px]">
+                          <SelectTrigger className="w-full">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="interested">
-                            Interested <span className="ml-2">🌱</span>
+                              Interested <span className="ml-2">🌱</span>
                             </SelectItem>
-                            <SelectItem value="preparing">Preparing <span className="ml-2">📚</span></SelectItem>
-                            <SelectItem value="applied">Applied <span className="ml-2">📨</span></SelectItem>
-                            <SelectItem value="interview">Interview <span className="ml-2">💼</span></SelectItem>
+                            <SelectItem value="preparing">
+                              Preparing <span className="ml-2">📚</span>
+                            </SelectItem>
+                            <SelectItem value="applied">
+                              Applied <span className="ml-2">📨</span>
+                            </SelectItem>
+                            <SelectItem value="interview">
+                              Interview <span className="ml-2">💼</span>
+                            </SelectItem>
                             <SelectItem value="waiting_result">
-                            Waiting Result <span className="ml-2">⏳</span>
+                              Waiting Result <span className="ml-2">⏳</span>
                             </SelectItem>
-                            <SelectItem value="rejected">Rejected <span className="ml-2">❌</span></SelectItem>
+                            <SelectItem value="rejected">
+                              Rejected <span className="ml-2">❌</span>
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -403,7 +409,7 @@ export function OpportunityForm({
                 <Collapsible
                   open={isOpen}
                   onOpenChange={setIsOpen}
-                  className="w-[350px] space-y-2"
+                  className="w-full space-y-2"
                 >
                   <div className="flex items-center justify-between space-x-4 px-2 pt-3 pb-3">
                     <h4 className="text-sm font-semibold">
@@ -550,7 +556,7 @@ export function OpportunityForm({
                                 <Button
                                   variant={"outline"}
                                   className={cn(
-                                    "w-[240px] pl-3 text-left font-normal",
+                                    "w-full pl-3 text-left font-normal",
                                     !field.value && "text-muted-foreground"
                                   )}
                                 >
@@ -581,6 +587,55 @@ export function OpportunityForm({
                           </Popover>
                           <FormDescription>
                             Published date of the job posting
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="submitted_at"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col pt-1">
+                          <FormLabel>Submitted Date</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "dd/MM/yyyy")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                  date > new Date() ||
+                                  date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormDescription>
+                            Submitted cv or application date
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
