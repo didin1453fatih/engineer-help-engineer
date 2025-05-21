@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import {
   Drawer,
   DrawerClose,
@@ -34,7 +34,13 @@ import {
 } from "@/components/ui/drawer";
 import { createClient } from "@/utils/supabase/client";
 import React, { useEffect, useState } from "react";
-import { CalendarIcon, ChevronsUpDown, Edit, Loader2 } from "lucide-react";
+import {
+  CalendarIcon,
+  ChevronsUpDown,
+  Edit,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { MyOpportunity } from "./data-table";
 import MultipleSelector, { Option } from "@/components/ui/multi-select";
@@ -50,14 +56,14 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
-import { Toast } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
   title: z.string().min(2).max(150),
   skills: z.array(z.string()).min(1),
   company_name: z.string().min(2).max(150),
-  source: z.string().min(2).max(150),
+  source: z.string().url(),
   status: z.string().min(2).max(150),
   note: z.string().min(0).max(150).optional(),
   salary_min: z.number().min(0).max(1000000).optional(),
@@ -108,7 +114,48 @@ export function OpportunityForm({
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenAI, setIsGenAI] = useState(false);
   const { toast } = useToast();
+
+  const extractDataFromUrl = async (url: string) => {
+    setIsGenAI(true);
+    fetch(`/api/job-page-summarize?url=${url}`, {
+      method: "GET",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((response) => {
+        const data = response.data;
+        form.setValue("title", data.title || undefined);
+        form.setValue("company_name", data.company_name || undefined);
+        form.setValue("skills", data.skills);
+        form.setValue("locations", data.locations);
+        form.setValue("salary_min", data.salary_min || undefined);
+        form.setValue("salary_max", data.salary_max || undefined);
+        form.setValue("salary_cycle", data.salary_cycle || undefined);
+        form.setValue("salary_currency", data.salary_currency || undefined);
+        form.setValue("job_description", data.job_description || undefined);
+        form.setValue("published_at", data.published_at);
+        form.setValue("submitted_at", data.submitted_at);
+        form.setValue("note", data.note || undefined);
+        form.setValue("tags", data.tags);
+      })
+      .catch((error) => {
+        toast({
+          className: cn("top-0 right-0 flex fixed md:max-w-[420px]"),
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+      })
+      .finally(() => {
+        setIsGenAI(false);
+      });
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -226,6 +273,59 @@ export function OpportunityForm({
               >
                 <FormField
                   control={form.control}
+                  name="source"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Source</FormLabel>
+                      <div className="flex">
+                        <FormControl>
+                          <Input
+                            onPaste={(e) => {
+                              extractDataFromUrl(
+                                e.clipboardData.getData("text")
+                              );
+                              form.setValue(
+                                "source",
+                                e.clipboardData.getData("text")
+                              );
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                            placeholder="Source"
+                            {...field}
+                            disabled={isSubmitting || isGenAI}
+                          />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="default"
+                          className="ml-2"
+                          onClick={(evt) => {
+                            extractDataFromUrl(field.value);
+                            evt.preventDefault();
+                            evt.stopPropagation();
+                          }}
+                        >
+                          {isGenAI ? (
+                            <>
+                              <span className="text-sm">Extracting</span>
+                              <Spinner size={"small"} className="ml-2" />
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-sm">Extract</span>
+                              <Sparkles className="ml-2 h-4 w-4" />
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="title"
                   render={({ field }) => (
                     <FormItem>
@@ -234,7 +334,7 @@ export function OpportunityForm({
                         <Input
                           placeholder="Job Title"
                           {...field}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isGenAI}
                         />
                       </FormControl>
                       <FormMessage />
@@ -250,6 +350,7 @@ export function OpportunityForm({
                       <FormLabel>Skills</FormLabel>
                       <FormControl>
                         <MultipleSelector
+                          disabled={isSubmitting || isGenAI}
                           value={field.value.map((val) => {
                             const existingSkill = skillsList.find(
                               (skill) => skill.value === val
@@ -287,24 +388,7 @@ export function OpportunityForm({
                         <Input
                           placeholder="Company name"
                           {...field}
-                          disabled={isSubmitting}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="source"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Source</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Source"
-                          {...field}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isGenAI}
                         />
                       </FormControl>
                       <FormMessage />
@@ -322,7 +406,7 @@ export function OpportunityForm({
                         <Select
                           value={field.value}
                           onValueChange={field.onChange}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isGenAI}
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue />
@@ -362,6 +446,7 @@ export function OpportunityForm({
                       <FormLabel>Private Tags</FormLabel>
                       <FormControl>
                         <MultipleSelector
+                          disabled={isSubmitting || isGenAI}
                           value={field?.value?.map((val) => {
                             const existingSkill = skillsList.find(
                               (skill) => skill.value === val
@@ -398,7 +483,7 @@ export function OpportunityForm({
                         <Textarea
                           placeholder="Input some note"
                           {...field}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isGenAI}
                         />
                       </FormControl>
                       <FormMessage />
@@ -431,6 +516,7 @@ export function OpportunityForm({
                           <FormLabel>Locations</FormLabel>
                           <FormControl>
                             <MultipleSelector
+                              disabled={isSubmitting || isGenAI}
                               value={skillsList.filter((skill) =>
                                 field.value.includes(skill.value)
                               )}
@@ -464,7 +550,7 @@ export function OpportunityForm({
                             <Input
                               placeholder="Input salary min"
                               {...field}
-                              disabled={isSubmitting}
+                              disabled={isSubmitting || isGenAI}
                             />
                           </FormControl>
                           <FormMessage />
@@ -482,7 +568,7 @@ export function OpportunityForm({
                             <Input
                               placeholder="Input salary max"
                               {...field}
-                              disabled={isSubmitting}
+                              disabled={isSubmitting || isGenAI}
                             />
                           </FormControl>
                           <FormMessage />
@@ -500,7 +586,7 @@ export function OpportunityForm({
                             <Input
                               placeholder="Input salary cycle"
                               {...field}
-                              disabled={isSubmitting}
+                              disabled={isSubmitting || isGenAI}
                             />
                           </FormControl>
                           <FormMessage />
@@ -518,7 +604,7 @@ export function OpportunityForm({
                             <Input
                               placeholder="Input currency"
                               {...field}
-                              disabled={isSubmitting}
+                              disabled={isSubmitting || isGenAI}
                             />
                           </FormControl>
                           <FormMessage />
@@ -536,7 +622,7 @@ export function OpportunityForm({
                             <Textarea
                               placeholder="Input job description"
                               {...field}
-                              disabled={isSubmitting}
+                              disabled={isSubmitting || isGenAI}
                             />
                           </FormControl>
                           <FormMessage />
@@ -554,6 +640,7 @@ export function OpportunityForm({
                             <PopoverTrigger asChild>
                               <FormControl>
                                 <Button
+                                  disabled={isSubmitting || isGenAI}
                                   variant={"outline"}
                                   className={cn(
                                     "w-full pl-3 text-left font-normal",
@@ -603,6 +690,7 @@ export function OpportunityForm({
                             <PopoverTrigger asChild>
                               <FormControl>
                                 <Button
+                                  disabled={isSubmitting || isGenAI}
                                   variant={"outline"}
                                   className={cn(
                                     "w-full pl-3 text-left font-normal",
