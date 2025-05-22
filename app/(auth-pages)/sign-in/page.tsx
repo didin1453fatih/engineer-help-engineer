@@ -2,6 +2,7 @@
 
 import { signInAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { FormMessage, Message } from "@/components/form-message";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,16 +12,23 @@ import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import { useState } from "react";
 
-export default function Login() {
-  const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
+export default async function Login(props: { searchParams: Promise<Message> }) {
+  const searchParams = await props.searchParams;
+  if ("message" in searchParams) {
+    return (
+      <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
+        <FormMessage message={searchParams} />
+      </div>
+    );
+  }
+
   const supabase = createClient();
   const loginWithGoogle = async () => {
-    setIsGoogleLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: process.env.GOOGLE_HTTP_CALLBACK_URL,
+          redirectTo: process.env.NEXT_PUBLIC_GOOGLE_HTTP_CALLBACK_URL,
         },
       });
 
@@ -34,7 +42,6 @@ export default function Login() {
         description: "Failed to sign in with Google. Please try again.",
         variant: "destructive",
       });
-      setIsGoogleLoading(false);
     }
   };
 
@@ -59,6 +66,7 @@ export default function Login() {
               </Link>
             </p>
           </div>
+          {/* <FormMessage message={searchParams} /> */}
           <div className="grid gap-6">
             <form>
               <div className="grid gap-2">
@@ -96,46 +104,38 @@ export default function Login() {
                 </span>
               </div>
             </div>
-            <button
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+            <SubmitButton
+              pendingText="Signing In..."
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 text-accent-foreground"
               type="button"
               onClick={loginWithGoogle}
-              disabled={isGoogleLoading}
             >
-              {isGoogleLoading ? (
-                <Spinner
-                  className="mr-2 h-4 w-4 animate-spin text-muted-foreground text-foreground"
-                  size={"small"}
-                  color="blue"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="800px"
+                height="800px"
+                viewBox="-3 0 262 262"
+                preserveAspectRatio="xMidYMid"
+              >
+                <path
+                  d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"
+                  fill="#4285F4"
                 />
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="800px"
-                  height="800px"
-                  viewBox="-3 0 262 262"
-                  preserveAspectRatio="xMidYMid"
-                >
-                  <path
-                    d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
-                    fill="#EB4335"
-                  />
-                </svg>
-              )}
+                <path
+                  d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
+                  fill="#34A853"
+                />
+                <path
+                  d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
+                  fill="#EB4335"
+                />
+              </svg>
               Google
-            </button>
+            </SubmitButton>
           </div>
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{" "}
