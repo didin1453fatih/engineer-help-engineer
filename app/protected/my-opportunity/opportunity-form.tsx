@@ -252,7 +252,7 @@ export function OpportunityForm({
       open={isDrawerOpen}
       onOpenChange={setIsDrawerOpen}
     >
-      <DrawerContent className="w-full sm:w-[415px] overflow-y-auto overflow-x-hidden">
+      <DrawerContent className="w-full sm:w-[415px] h-screen overflow-y-auto overflow-x-hidden">
         <div className="sm:px-2 py-1">
           <DrawerHeader>
             <DrawerTitle>
