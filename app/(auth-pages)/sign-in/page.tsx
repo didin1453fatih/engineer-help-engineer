@@ -65,8 +65,14 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
                 Sign up
               </Link>
             </p>
+            <Link
+              className="text-sm font-medium text-primary underline underline-offset-4 hover:text-primary"
+              href="/forgot-password"
+            >
+              Forgot password?
+            </Link>
           </div>
-          {/* <FormMessage message={searchParams} /> */}
+          <FormMessage message={searchParams} />
           <div className="grid gap-6">
             <form>
               <div className="grid gap-2">
