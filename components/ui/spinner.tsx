@@ -33,12 +33,13 @@ interface SpinnerContentProps
     VariantProps<typeof loaderVariants> {
   className?: string;
   children?: React.ReactNode;
+  color?: string;
 }
 
-export function Spinner({ size, show, children, className }: SpinnerContentProps) {
+export function Spinner({ size, show, children, className, color='white' }: SpinnerContentProps) {
   return (
     <span className={spinnerVariants({ show })}>
-      <Sparkles height={15} className={cn(loaderVariants({ size }), className)} color='white' />
+      <Sparkles height={15} className={cn(loaderVariants({ size }), className)} color={color} />
       {children}
     </span>
   );
