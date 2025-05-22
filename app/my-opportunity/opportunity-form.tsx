@@ -249,11 +249,7 @@ export function OpportunityForm({
             company_description: values.company_description,
           },
         ]);
-        console.log(data);
-        console.log(error);
-        // router.refresh();
         if (error) {
-          console.log(error);
           toast({
             className: cn("top-0 right-0 flex fixed md:max-w-[420px]"),
             variant: "destructive",
@@ -287,9 +283,17 @@ export function OpportunityForm({
           })
           .eq("id", opportunity.id)
           .select();
-        console.log(data);
-        console.log(error);
+        if (error) {
+          toast({
+            className: cn("top-0 right-0 flex fixed md:max-w-[420px]"),
+            variant: "destructive",
+            title: "Error",
+            description: error.message,
+          });
+          return;
+        }
         router.refresh();
+        setIsDrawerOpen(false);
       }
       console.log(values);
     } finally {

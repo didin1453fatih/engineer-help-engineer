@@ -11,8 +11,19 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { formatDistanceToNow } from "date-fns";
-
+import { formatDistanceToNow, set } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { createClient } from "@/utils/supabase/client";
 import {
   Table,
   TableBody,
@@ -63,6 +74,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Toaster } from "@/components/ui/toaster";
 import { StatusBadge } from "./status-badge";
+import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DataTableProps<MyOpportunity> {
   data: MyOpportunity[];
@@ -103,6 +118,10 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+  const [isOpenDeleteConfirmation, setIsOpenDeleteConfirmation] =
+    React.useState(false);
+  const [idToDelete, setIdToDelete] = React.useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const [columns, setColumns] = React.useState<ColumnDef<MyOpportunity>[]>([
     {
@@ -173,7 +192,6 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                     No location
                   </div>
                 )}
-                {/* <Dot className="m-0" /> */}
                 <span className="text-xl font-black pl-1 pr-1">·</span>
                 {my_opportunity.salary_min && my_opportunity.salary_max ? (
                   <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
@@ -185,7 +203,6 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                     No salary range
                   </div>
                 )}
-                {/* <Dot className="m-0" /> */}
                 <span className="text-xl font-black pl-1 pr-1">·</span>
                 {my_opportunity.skills.length > 0 ? (
                   my_opportunity.skills.map((skill, index) => (
@@ -258,7 +275,10 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                 </div>
               </div>
               <div className="flex items-start md:hidden mt-2 align-start">
-                <span className="text-xs items-center text-muted-foreground" style={{width:54}}>
+                <span
+                  className="text-xs items-center text-muted-foreground"
+                  style={{ width: 54 }}
+                >
                   Note :
                 </span>
                 <div className="text-xs items-start text-muted-foreground ml-1">
@@ -341,7 +361,15 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                     <span className="sr-only">Open menu</span>
                     <MoreHorizontal height={20} />
                   </Button>
-                  <Button variant="outline" className=" w-full sm:hidden" size={"sm"}>
+                  <Button
+                    variant="outline"
+                    className=" w-full sm:hidden"
+                    size={"sm"}
+                    style={{
+                      borderColor: "oklch(87.1% 0.006 286.286)",
+                      borderWidth: 1.5,
+                    }}
+                  >
                     Actions
                   </Button>
                 </div>
@@ -362,15 +390,22 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                   Edit
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                   <Globe height={15} className="pr-1" />
                   Pubish
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Archive height={15} className="pr-1" />
-                  Archive
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                  Archive <span className="text-muted-foreground ml-2">[comming soon]</span>
+                </DropdownMenuItem> */}
+                <DropdownMenuItem
+                  onClick={() => {
+                    setTimeout(() => {
+                      setIdToDelete(my_opportunity.id);
+                      setIsOpenDeleteConfirmation(true);
+                    }, 100);
+                  }}
+                >
                   <Trash height={15} className="pr-1" />
                   Delete
                 </DropdownMenuItem>
@@ -382,6 +417,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
     },
   ]);
 
+  const router = useRouter();
   const table = useReactTable({
     data,
     columns,
@@ -395,6 +431,41 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
       columnVisibility,
     },
   });
+
+  async function onDelete(myOpportunityId: number) {
+    setIsDeleting(true);
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("my_opportunity")
+      .delete()
+      .eq("id", myOpportunityId)
+      .select();
+
+    if (error) {
+      toast({
+        className: cn("top-0 right-0 flex fixed md:max-w-[420px]"),
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+      setIsDeleting(false);
+      return;
+    }
+
+    router.refresh();
+    setTimeout(() => {
+      setIsDeleting(false);
+      setIsOpenDeleteConfirmation(false);
+      setIdToDelete(null);
+      toast({
+        className: cn("top-0 right-0 flex fixed md:max-w-[420px]"),
+        variant: "default",
+        title: "Success",
+        description: "Opportunity deleted successfully",
+      });
+    }, 1000);
+  }
 
   return (
     <div>
@@ -473,7 +544,6 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                           width: `${header.getSize()}px`,
                         }),
                       }}
-                      //   style={{ width: `${header.getSize()}px` }}
                       className={`px-1 border-r ${index == 0 ? "pl-6" : ""} ${[1, 2, 3, 4].indexOf(index) >= 0 ? "text-center" : ""}`}
                     >
                       {header.isPlaceholder
@@ -623,6 +693,39 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
         setIsDrawerOpen={setIsDrawerOpen}
       />
       <Toaster />
+      <AlertDialog
+        open={isOpenDeleteConfirmation}
+        onOpenChange={setIsOpenDeleteConfirmation}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              account and remove your data from servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                onDelete(idToDelete!);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeleting}
+            >
+              {isDeleting && (
+                <Spinner
+                  className="mr-2 h-4 w-4 animate-spin text-destructive-foreground"
+                  size={"small"}
+                />
+              )}
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
