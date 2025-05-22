@@ -381,6 +381,7 @@ export function OpportunityForm({
                       <FormLabel>Skills</FormLabel>
                       <FormControl>
                         <MultipleSelector
+                          hidePlaceholderWhenSelected={true}
                           disabled={isSubmitting || isGenAI}
                           value={field.value.map((val) => {
                             const existingSkill = skillsList.find(

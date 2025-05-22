@@ -64,22 +64,26 @@ export default async function AuthButton() {
   return user ? (
     <>
       <div className="flex items-center gap-4 hidden md:inline-flex">
-        <Button
-          type="submit"
-          variant={"ghost"}
-          className="hover:bg-accent transition-colors text-foreground/90"
-        >
-          <Globe height={17} />
-          <span>Global Opportunity</span>
-        </Button>
-        <Button
-          type="submit"
-          variant={"ghost"}
-          className="hover:bg-accent transition-colors text-foreground/90"
-        >
-          <BookUser height={17} />
-          <span>My Opportunity</span>
-        </Button>
+        <a href="/global-opportunity">
+          <Button
+            type="submit"
+            variant={"ghost"}
+            className="hover:bg-accent transition-colors text-foreground/90"
+          >
+            <Globe height={17} />
+            <span>Global Opportunity</span>
+          </Button>
+        </a>
+        <a href="/my-opportunity">
+          <Button
+            type="submit"
+            variant={"ghost"}
+            className="hover:bg-accent transition-colors text-foreground/90"
+          >
+            <BookUser height={17} />
+            <span>My Opportunity</span>
+          </Button>
+        </a>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="submit" variant={"outline"} className="h-9 pl-2 pr-3">
@@ -99,10 +103,10 @@ export default async function AuthButton() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={signOutAction}>
-                <LogOut height={17} />
-                <span className="ml-1">Log out</span>
-              </DropdownMenuItem>
+            <DropdownMenuItem onClick={signOutAction}>
+              <LogOut height={17} />
+              <span className="ml-1">Log out</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
