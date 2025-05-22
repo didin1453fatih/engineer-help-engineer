@@ -111,13 +111,48 @@ export default async function AuthButton() {
         </DropdownMenu>
       </div>
       <div className="md:hidden">
-        <Button
-          type="submit"
-          variant={"outline"}
-          className="hover:bg-accent transition-colors text-foreground/90"
-        >
-          <Menu />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="submit"
+              variant={"outline"}
+              className="hover:bg-accent transition-colors text-foreground/90"
+            >
+              <Menu />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-50 pt-1 pb-1">
+            <DropdownMenuLabel className="font-normal">Menus</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <a href="/global-opportunity" className="flex items-center">
+                  <Globe height={17} />
+                  <span>Global Opportunity</span>
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <a href="/my-opportunity" className="flex items-center">
+                  <BookUser height={17} />
+                  <span>My Opportunity</span>
+                </a>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="font-normal">
+              Account
+            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <Settings height={17} />
+                <span className="ml-1">Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={signOutAction}>
+                <LogOut height={17} />
+                <span className="ml-1">Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </>
   ) : (

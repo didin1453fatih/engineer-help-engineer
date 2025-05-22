@@ -309,6 +309,11 @@ export function OpportunityForm({
     { value: "ember", label: "Ember" },
   ];
 
+  const locationsList:{
+    value: string;
+    label: string;
+  }[] = []
+
   return (
     <Drawer
       direction="right"
@@ -577,24 +582,27 @@ export function OpportunityForm({
                   <CollapsibleContent className="space-y-2">
                     <FormField
                       control={form.control}
-                      name="skills"
+                      name="locations"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Locations</FormLabel>
                           <FormControl>
                             <MultipleSelector
+                              defaultOptions={locationsList}
+                              placeholder="Add locations"
+                              creatable
                               disabled={isSubmitting || isGenAI}
-                              value={skillsList.filter((skill) =>
-                                field.value.includes(skill.value)
-                              )}
+                              value={field?.value?.map((val) => {
+                                const existingLocation = locationsList.find(
+                                  (skill) => skill.value === val
+                                );
+                                return existingLocation || { value: val, label: val };
+                              })}
                               onChange={(options: Option[]) => {
                                 field.onChange(
                                   options.map((option) => option.value)
                                 );
-                              }}
-                              defaultOptions={skillsList}
-                              placeholder="Select skills"
-                              creatable
+                              }}                           
                               emptyIndicator={
                                 <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                   no results found.

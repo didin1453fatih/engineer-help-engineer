@@ -352,7 +352,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
         return (
           <>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild style={{ width: 200 }}>
                 <div>
                   <Button
                     variant="ghost"
@@ -362,13 +362,9 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                     <MoreHorizontal height={20} />
                   </Button>
                   <Button
-                    variant="outline"
-                    className=" w-full sm:hidden"
+                    variant="default"
+                    className="w-auto sm:hidden"
                     size={"sm"}
-                    style={{
-                      borderColor: "oklch(87.1% 0.006 286.286)",
-                      borderWidth: 1.5,
-                    }}
                   >
                     Actions
                   </Button>
