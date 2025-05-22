@@ -87,6 +87,7 @@ export interface MyOpportunity {
   tags: string[];
   description: string;
   submitted_at: string;
+  company_description: string;
 }
 
 export function DataTable({ data }: DataTableProps<MyOpportunity>) {
@@ -148,8 +149,8 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                       </div>
                     </div>
                     <div className="line-clamp-2 text-xs text-muted-foreground pt-1">
-                      {my_opportunity.description
-                        ? my_opportunity.description
+                      {my_opportunity.company_description
+                        ? my_opportunity.company_description
                         : " No description"}
                     </div>
                   </div>

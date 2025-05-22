@@ -62,7 +62,8 @@ export async function GET(request: Request) {
                   salary_max:number
                   currency:string
                   salary_cycle:string
-                  description: short description of this company, maximum 25 words.
+                  company_description: short description of this company, maximum 25 words.
+                  job_description: get full job description from the page and formating using markdown format.
                   }
           `
 

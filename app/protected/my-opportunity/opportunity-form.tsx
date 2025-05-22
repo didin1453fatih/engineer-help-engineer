@@ -73,8 +73,9 @@ const formSchema = z.object({
   locations: z.array(z.string()).optional(),
   published_at: z.date().optional(),
   submitted_at: z.date().optional(),
-  job_description: z.string().min(0).max(150).optional(),
+  job_description: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  company_description: z.string().min(0).max(250).optional(),
 });
 
 export function OpportunityForm({
@@ -115,9 +116,26 @@ export function OpportunityForm({
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenAI, setIsGenAI] = useState(false);
+  const [loadingExtractText, setLoadingExtractText] = useState("Extract");
   const { toast } = useToast();
 
   const extractDataFromUrl = async (url: string) => {
+    setLoadingExtractText("Reading the page...");
+    const intervalTask = setInterval(() => {
+      setLoadingExtractText((prev) => {
+        if (prev === "Reading the page...") {
+          return "Getting a cup of coffee...";
+        } else if (prev === "Getting a cup of coffee...") {
+          return "Extracting data...";
+        } else if (prev === "Extracting data...") {
+          return "Playing console...";
+        } else if (prev === "Playing console...") {
+          return "Writing...";
+        } else {
+          return "Writing...";
+        }
+      });
+    }, 2000);
     setIsGenAI(true);
     fetch(`/api/job-page-summarize?url=${url}`, {
       method: "GET",
@@ -130,6 +148,10 @@ export function OpportunityForm({
       })
       .then((response) => {
         const data = response.data;
+        if (!data) {
+          throw new Error("Sorry, our AI cannot extract data from this page.");
+        }
+
         form.setValue("title", data.title || undefined);
         form.setValue("company_name", data.company_name || undefined);
         form.setValue("skills", data.skills);
@@ -143,6 +165,10 @@ export function OpportunityForm({
         form.setValue("submitted_at", data.submitted_at);
         form.setValue("note", data.note || undefined);
         form.setValue("tags", data.tags);
+        form.setValue(
+          "company_description",
+          data.company_description || undefined
+        );
       })
       .catch((error) => {
         toast({
@@ -153,6 +179,8 @@ export function OpportunityForm({
         });
       })
       .finally(() => {
+        clearInterval(intervalTask);
+        setLoadingExtractText("Extract");
         setIsGenAI(false);
       });
   };
@@ -188,6 +216,7 @@ export function OpportunityForm({
             submitted_at: values.submitted_at,
             job_description: values.job_description,
             tags: values.tags || [],
+            company_description: values.company_description,
           },
         ]);
         console.log(data);
@@ -213,7 +242,6 @@ export function OpportunityForm({
             company_name: values.company_name,
             source: values.source,
             status: values.status,
-            user_id: user.id,
             note: values.note,
             skills: values.skills,
             salary_min: values.salary_min,
@@ -225,6 +253,7 @@ export function OpportunityForm({
             submitted_at: values.submitted_at,
             job_description: values.job_description,
             tags: values.tags || [],
+            company_description: values.company_description,
           })
           .eq("id", opportunity.id)
           .select();
@@ -308,7 +337,9 @@ export function OpportunityForm({
                         >
                           {isGenAI ? (
                             <>
-                              <span className="text-sm">Extracting</span>
+                              <span className="text-sm">
+                                {loadingExtractText}
+                              </span>
                               <Spinner size={"small"} className="ml-2" />
                             </>
                           ) : (
@@ -603,6 +634,23 @@ export function OpportunityForm({
                           <FormControl>
                             <Input
                               placeholder="Input currency"
+                              {...field}
+                              disabled={isSubmitting || isGenAI}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="company_description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Company Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Input company description"
                               {...field}
                               disabled={isSubmitting || isGenAI}
                             />
