@@ -732,7 +732,7 @@ export function OpportunityForm({
                   </CollapsibleContent>
                 </Collapsible>
 
-                <div className="flex gap-4 pt-3 pb-5">
+                <div className="flex gap-4 pt-3 pb-10">
                   <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

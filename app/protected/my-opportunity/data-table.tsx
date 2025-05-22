@@ -223,7 +223,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                 <span className="text-xs items-center text-muted-foreground">
                   Private Tag :
                 </span>
-                <div className="flex items-center gap-2 pl-2">
+                <div className="flex items-center gap-2 pl-1">
                   {my_opportunity.tags.length > 0 ? (
                     my_opportunity.tags.map((tag, index) => (
                       <div
@@ -245,7 +245,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                 <span className="text-xs items-center text-muted-foreground">
                   Submitted At :
                 </span>
-                <div className="text-xs items-center text-muted-foreground ml-2">
+                <div className="text-xs items-center text-muted-foreground ml-1">
                   {my_opportunity.submitted_at
                     ? formatDistanceToNow(
                         new Date(my_opportunity.submitted_at),
@@ -256,11 +256,11 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                     : " No submission"}
                 </div>
               </div>
-              <div className="flex mt-2 items-center md:hidden mt-2 ">
-                <span className="text-xs items-center text-muted-foreground">
+              <div className="flex items-start md:hidden mt-2 align-start">
+                <span className="text-xs items-center text-muted-foreground" style={{width:54}}>
                   Note :
                 </span>
-                <div className="text-xs items-center text-muted-foreground ml-2">
+                <div className="text-xs items-start text-muted-foreground ml-1">
                   {my_opportunity.note ? my_opportunity.note : ""}
                 </div>
               </div>
@@ -332,10 +332,18 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
           <>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal height={20} />
-                </Button>
+                <div>
+                  <Button
+                    variant="ghost"
+                    className="h-8 w-8 p-0 sm:block hidden"
+                  >
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal height={20} />
+                  </Button>
+                  <Button variant="outline" className=" w-full sm:hidden" size={"sm"}>
+                    Actions
+                  </Button>
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
@@ -411,8 +419,8 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
               setSelectedMyOpportunity(null);
             }}
             style={{
-                borderColor: "oklch(93.2% 0.032 255.585)",
-                borderWidth: 1.5,
+              borderColor: "oklch(93.2% 0.032 255.585)",
+              borderWidth: 1.5,
             }}
           >
             <span>🚀</span>
@@ -516,12 +524,19 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => {
               const mainColumn = row.getVisibleCells()[0];
+              const actionsColumn =
+                row.getVisibleCells()[row.getVisibleCells().length - 1];
               return (
-                <div key={row.id} className="border-b p-4 space-y-2">
+                <div key={row.id} className="border-b p-4 space-y-2 pb-7">
                   <div className="font-medium">
                     {flexRender(
                       mainColumn.column.columnDef.cell,
                       mainColumn.getContext()
+                    )}
+
+                    {flexRender(
+                      actionsColumn.column.columnDef.cell,
+                      actionsColumn.getContext()
                     )}
                   </div>
                 </div>
@@ -541,7 +556,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
               table.setPageSize(Number(value));
-            }}            
+            }}
           >
             <SelectTrigger className="h-8 w-[70px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
