@@ -20,7 +20,7 @@ export default async function DemoPage() {
 
   if (error) {
     // do error message
-  }
+  } 
 
   return (
     <div className="">
