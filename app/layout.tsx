@@ -63,7 +63,7 @@ export default function RootLayout({
                   |
                 </p>
                 <p>
-                  Swith Theme
+                  Theme
                 </p>
                 <ThemeSwitcher />
               </footer>

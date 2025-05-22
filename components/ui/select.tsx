@@ -23,6 +23,7 @@ const SelectTrigger = React.forwardRef<
       className
     )}
     {...props}
+    style={{ marginLeft: 0 }}
   >
     {children}
     <div className="pl-1">

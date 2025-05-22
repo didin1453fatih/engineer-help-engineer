@@ -113,17 +113,26 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
         return (
           <React.Fragment>
             <div
-              className="mb-3 w-full flex flex-col items-start gap-0 rounded-lg pl-2 pr-2 pb-3 pl-0 text-left text-sm transition-all "
+              className="mb-3 w-full flex flex-col items-start gap-0 rounded-lg  pr-2 pb-3 pl-0 text-left text-sm transition-all "
               onClick={() => {}}
             >
-              <div className="ml-auto text-xs text-muted-foreground w-full text-right pt-2">
-                {my_opportunity.published_at
-                  ? formatDistanceToNow(new Date(my_opportunity.published_at), {
-                      addSuffix: true,
-                    })
-                  : formatDistanceToNow(new Date(my_opportunity.created_at), {
-                      addSuffix: true,
-                    })}
+              <div className="flex w-full justify-between items-start md:pb-0 pb-2">
+                <StatusBadge
+                  status={row.original.status}
+                  className="md:hidden"
+                />
+                <div className="ml-auto text-xs text-muted-foreground w-full text-right sm:pt-2">
+                  {my_opportunity.published_at
+                    ? formatDistanceToNow(
+                        new Date(my_opportunity.published_at),
+                        {
+                          addSuffix: true,
+                        }
+                      )
+                    : formatDistanceToNow(new Date(my_opportunity.created_at), {
+                        addSuffix: true,
+                      })}
+                </div>
               </div>
               <div className="flex w-full flex-col gap-1">
                 <div className="flex items-top">
@@ -139,7 +148,6 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                       </div>
                     </div>
                     <div className="line-clamp-2 text-xs text-muted-foreground pt-1">
-                      Description :
                       {my_opportunity.description
                         ? my_opportunity.description
                         : " No description"}
@@ -147,7 +155,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-1 mt-2">
+              <div className="flex flex-wrap items-center gap-y-2 gap-x-1 mt-2">
                 {my_opportunity.locations.length > 0 ? (
                   my_opportunity.locations.map((location, index) => (
                     <div
@@ -164,7 +172,8 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                     No location
                   </div>
                 )}
-                <Dot className="m-0" />
+                {/* <Dot className="m-0" /> */}
+                <span className="text-xl font-black pl-1 pr-1">·</span>
                 {my_opportunity.salary_min && my_opportunity.salary_max ? (
                   <div className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
                     {my_opportunity.salary_min} - {my_opportunity.salary_max}{" "}
@@ -175,7 +184,8 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                     No salary range
                   </div>
                 )}
-                <Dot className="m-0" />
+                {/* <Dot className="m-0" /> */}
+                <span className="text-xl font-black pl-1 pr-1">·</span>
                 {my_opportunity.skills.length > 0 ? (
                   my_opportunity.skills.map((skill, index) => (
                     <div
@@ -204,6 +214,54 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                       ? my_opportunity.source.substring(0, 30) + "..."
                       : my_opportunity.source}
                   </a>
+                </div>
+              </div>
+              <div className="w-full pr-20 pt-5 md:hidden">
+                <div className="border-b"></div>
+              </div>
+              <div className="flex flex-wrap mt-2 items-center md:hidden mt-5">
+                <span className="text-xs items-center text-muted-foreground">
+                  Private Tag :
+                </span>
+                <div className="flex items-center gap-2 pl-2">
+                  {my_opportunity.tags.length > 0 ? (
+                    my_opportunity.tags.map((tag, index) => (
+                      <div
+                        key={index}
+                        className="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2  bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                      >
+                        {tag}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-xs items-center text-muted-foreground">
+                      No tags
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap mt-2 items-center md:hidden mt-2">
+                <span className="text-xs items-center text-muted-foreground">
+                  Submitted At :
+                </span>
+                <div className="text-xs items-center text-muted-foreground ml-2">
+                  {my_opportunity.submitted_at
+                    ? formatDistanceToNow(
+                        new Date(my_opportunity.submitted_at),
+                        {
+                          addSuffix: true,
+                        }
+                      )
+                    : " No submission"}
+                </div>
+              </div>
+              <div className="flex mt-2 items-center md:hidden mt-2 ">
+                <span className="text-xs items-center text-muted-foreground">
+                  Note :
+                </span>
+                <div className="text-xs items-center text-muted-foreground ml-2">
+                  {my_opportunity.note ? my_opportunity.note : ""}
                 </div>
               </div>
             </div>
@@ -331,63 +389,69 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between md:pb-0 pb-2">
-        <div className="flex h-[60px] items-center ">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between md:pb-0 pb-2 mt-2 sm:mt-0">
+        <div className="flex h-[60px] items-center order-2 sm:order-none">
           <Input
             placeholder="Filter title..."
             value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("title")?.setFilterValue(event.target.value)
             }
-            className="w-full md:w-[300px] mr-2"
+            className="w-full md:w-[300px]"
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 order-1 sm:order-none">
           <Button
             variant="outline"
-            className="inline-flex items-center justify-center  py-2"
+            className="inline-flex items-center justify-center  py-2 w-full sm:w-auto"
             onClick={() => {
               setIsDrawerOpen(true);
               setDrawerAction("new");
               setSelectedMyOpportunity(null);
+            }}
+            style={{
+                borderColor: "oklch(93.2% 0.032 255.585)",
+                borderWidth: 1.5,
             }}
           >
             <span>🚀</span>
             <span className="ml-2">New Opportunity</span>
           </Button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="inline-flex items-center justify-center w-10 p-0"
-              >
-                <Cog />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="hidden md:block">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="inline-flex items-center justify-center w-10 p-0"
+                >
+                  <Cog />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
       <div className="rounded-md border w-full">
-        <Table className="w-full table-auto">
+        <Table className="w-full table-auto hidden md:block">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -447,15 +511,37 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
             )}
           </TableBody>
         </Table>
+
+        <div className="md:hidden">
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => {
+              const mainColumn = row.getVisibleCells()[0];
+              return (
+                <div key={row.id} className="border-b p-4 space-y-2">
+                  <div className="font-medium">
+                    {flexRender(
+                      mainColumn.column.columnDef.cell,
+                      mainColumn.getContext()
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="h-24 flex items-center justify-center text-muted-foreground">
+              No results.
+            </div>
+          )}
+        </div>
       </div>
       <div className="flex items-center justify-between pt-3 pb-4">
         <div className="flex items-center space-x-2">
-          <p className="text-sm hidden sm:block">Rows per page</p>
+          <p className="text-sm hidden sm:block mr-2">Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
               table.setPageSize(Number(value));
-            }}
+            }}            
           >
             <SelectTrigger className="h-8 w-[70px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
