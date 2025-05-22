@@ -119,7 +119,18 @@ export function OpportunityForm({
   const [loadingExtractText, setLoadingExtractText] = useState("Extract");
   const { toast } = useToast();
 
-  const extractDataFromUrl = async (url: string) => {
+  const extractDataFromUrl = async (rawTextUrl: string) => {
+    const url = extractValidUrlInput(rawTextUrl);
+    if (!url) {
+      toast({
+        className: cn("top-0 right-0 flex fixed md:max-w-[420px]"),
+        variant: "destructive",
+        title: "Error",
+        description: "Please input a valid URL",
+      });
+      return;
+    }
+    form.setValue("source", url);
     setLoadingExtractText("Reading the page...");
     const intervalTask = setInterval(() => {
       setLoadingExtractText((prev) => {
@@ -184,6 +195,25 @@ export function OpportunityForm({
         setIsGenAI(false);
       });
   };
+
+  function extractValidUrlInput(input: string) {
+    const urlRegex =
+      /\b(?:https?:\/\/)?(?:www\.)?[a-z0-9-]+\.[a-z]{2,}(?:\/[^\s]*)?/i;
+    const match = input.match(urlRegex);
+
+    if (!match) {
+      return null;
+    }
+    let url = match[0];
+    url = url.replace(/^https?:\/\//i, ""); // Remove existing protocol
+    url = `https://${url}`; // Prepend HTTPS
+
+    if (!url.startsWith("https://www.") && url.includes("www.")) {
+      url = url.replace("www.", "https://www.");
+    }
+
+    return url;
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -305,16 +335,17 @@ export function OpportunityForm({
                   name="source"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Source</FormLabel>
+                      <FormLabel>
+                        Source{" "}
+                        <span className="text-muted-foreground">
+                          Mixed text with URL is ok
+                        </span>
+                      </FormLabel>
                       <div className="flex">
                         <FormControl>
                           <Input
                             onPaste={(e) => {
                               extractDataFromUrl(
-                                e.clipboardData.getData("text")
-                              );
-                              form.setValue(
-                                "source",
                                 e.clipboardData.getData("text")
                               );
                               e.preventDefault();
