@@ -1,68 +1,19 @@
-// "use client";
-
-import { signInAction, signInGoogle } from "@/app/actions";
+import { signInAction, signInGoogleAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { FormMessage, Message } from "@/components/form-message";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { Toaster } from "@/components/ui/toaster";
-import { toast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
-import { useState } from "react";
-import { redirect } from "next/navigation";
 
-export default function Login(props: { searchParams: Promise<Message> }) {
-  // const searchParams = await props.searchParams;
-  // if ("message" in searchParams) {
-  //   return (
-  //     <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
-  //       <FormMessage message={searchParams} />
-  //     </div>
-  //   );
-  // }
-
-  const loginByGoogleServer = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo:
-          "https://engineer-help-engineer.vercel.app/auth/v1/callback",
-      },
-    });
-    if (data.url) {
-      redirect(data.url); // use the redirect API for your server framework
-    }
-    if (error) {
-      console.error("Error signing in with Google:", error);
-    }
-  };
-
-  const supabase = createClient();
-  const loginWithGoogle = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          // redirectTo: process.env.NEXT_PUBLIC_GOOGLE_HTTP_CALLBACK_URL,
-          redirectTo:
-            "https://engineer-help-engineer.vercel.app/auth/v1/callback",
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      toast({
-        className: cn("top-0 right-0 flex fixed md:max-w-[420px]"),
-        title: "Error",
-        description: "Failed to sign in with Google. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+export default async function Login(props: { searchParams: Promise<Message> }) {
+  const searchParams = await props.searchParams;
+  if ("message" in searchParams) {
+    return (
+      <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
+        <FormMessage message={searchParams} />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -91,7 +42,7 @@ export default function Login(props: { searchParams: Promise<Message> }) {
               Forgot password?
             </Link>
           </div>
-          {/* <FormMessage message={searchParams} /> */}
+          <FormMessage message={searchParams} />
           <div className="grid gap-6">
             <form>
               <div className="grid gap-2">
@@ -132,8 +83,8 @@ export default function Login(props: { searchParams: Promise<Message> }) {
             <form>
               <SubmitButton
                 pendingText="Signing In..."
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 text-accent-foreground"
-                formAction={signInGoogle}
+                className="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 text-accent-foreground"
+                formAction={signInGoogleAction}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

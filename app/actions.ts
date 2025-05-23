@@ -57,19 +57,19 @@ export const signInAction = async (formData: FormData) => {
 };
 
 
-export const signInGoogle = async (formData: FormData) => {
+export const signInGoogleAction = async () => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider:'google',
+    provider: 'google',
     options: {
-      redirectTo: 'https://engineer-help-engineer.vercel.app/auth/v1/callback',
+      redirectTo: process.env.NEXT_PUBLIC_GOOGLE_HTTP_CALLBACK_URL,
     },
   })
   if (data.url) {
-    redirect(data.url) // use the redirect API for your server framework
+    redirect(data.url)
   }
   if (error) {
-    console.error('Error signing in with Google:', error)
+    return encodedRedirect("error", "/sign-in", error.message);
   }
 };
 
