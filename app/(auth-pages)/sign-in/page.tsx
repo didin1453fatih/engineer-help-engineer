@@ -28,7 +28,8 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: 'https://fybisoqdubmhmdoxspjr.supabase.co/auth/v1/callback',
+          // redirectTo: process.env.NEXT_PUBLIC_GOOGLE_HTTP_CALLBACK_URL,
+          redirectTo: "https://engineer-help-engineer.vercel.app/auth/v1/callback",
         },
       });
 
