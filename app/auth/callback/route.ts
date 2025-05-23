@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   }
 
   if (redirectTo) {
-    return NextResponse.redirect(`${origin}${redirectTo}`);
+    return NextResponse.redirect(`https://engineer-help-engineer.vercel.app/protected`)
   }
 
   // URL to redirect to after sign up process completes
