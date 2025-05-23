@@ -64,7 +64,7 @@ export default async function AuthButton() {
   return user ? (
     <>
       <div className="flex items-center gap-4 hidden md:inline-flex">
-        <a href="/global-opportunity">
+        <a href="/global-opportunity-under-construction">
           <Button
             type="submit"
             variant={"ghost"}
@@ -125,7 +125,7 @@ export default async function AuthButton() {
             <DropdownMenuLabel className="font-normal">Menus</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <a href="/global-opportunity" className="flex items-center">
+                <a href="/global-opportunity-under-construction" className="flex items-center">
                   <Globe height={17} />
                   <span>Global Opportunity</span>
                 </a>
