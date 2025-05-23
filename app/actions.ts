@@ -56,6 +56,23 @@ export const signInAction = async (formData: FormData) => {
   return redirect("/protected");
 };
 
+
+export const signInGoogle = async (formData: FormData) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider:'google',
+    options: {
+      redirectTo: 'https://engineer-help-engineer.vercel.app/auth/v1/callback',
+    },
+  })
+  if (data.url) {
+    redirect(data.url) // use the redirect API for your server framework
+  }
+  if (error) {
+    console.error('Error signing in with Google:', error)
+  }
+};
+
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const supabase = await createClient();
