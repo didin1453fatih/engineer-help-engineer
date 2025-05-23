@@ -30,7 +30,7 @@ export default async function Signup(props: {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: process.env.NEXT_PUBLIC_GOOGLE_HTTP_CALLBACK_URL,
+          redirectTo: 'https://fybisoqdubmhmdoxspjr.supabase.co/auth/v1/callback',
         },
       });
 
