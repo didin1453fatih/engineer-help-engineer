@@ -352,7 +352,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
         return (
           <>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild style={{ width: 200 }}>
+              <DropdownMenuTrigger asChild className="w-fit">
                 <div>
                   <Button
                     variant="ghost"
@@ -370,7 +370,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                   </Button>
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" side="right">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() => {
