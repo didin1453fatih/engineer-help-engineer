@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 
 export async function GET(request: Request) {
+  console.log('auth callback ----------------------')
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   // if "next" is in param, use it as the redirect URL
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
       // } else if (forwardedHost) {
       //   return NextResponse.redirect(`https://${forwardedHost}${next}`)
       // } else {
-        return NextResponse.redirect(`${origin}${next}`)
+        return NextResponse.redirect(`https://engineer-help-engineer.vercel.app/protected`)
       // }
     }
   }
