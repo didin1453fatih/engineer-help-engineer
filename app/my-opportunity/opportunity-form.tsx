@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format, set } from "date-fns";
+import { addDays, format, set } from "date-fns";
 import {
   Drawer,
   DrawerClose,
@@ -58,6 +58,7 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import { Spinner } from "@/components/ui/spinner";
+import { PopoverClose, PopoverPortal } from "@radix-ui/react-popover";
 
 const formSchema = z.object({
   title: z.string().min(2).max(150),
@@ -309,10 +310,10 @@ export function OpportunityForm({
     { value: "ember", label: "Ember" },
   ];
 
-  const locationsList:{
+  const locationsList: {
     value: string;
     label: string;
-  }[] = []
+  }[] = [];
 
   return (
     <Drawer
@@ -512,6 +513,77 @@ export function OpportunityForm({
 
                 <FormField
                   control={form.control}
+                  name="submitted_at"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col pt-1">
+                      <FormLabel>Submitted Date</FormLabel>
+                      <Popover modal={true}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              disabled={isSubmitting || isGenAI}
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "dd/MM/yyyy")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <PopoverClose>
+                            <div className="flex items-center justify-between px-2 pt-2">
+                              <Button
+                                variant="outline"
+                                className="w-full text-left mr-1"
+                                onClick={() => {
+                                  field.onChange(new Date());
+                                }}
+                              >
+                                Today
+                              </Button>
+
+                              <Button
+                                variant="outline"
+                                className="w-full text-left ml-1"
+                                onClick={() => {
+                                  field.onChange(addDays(new Date(), -1));
+                                }}
+                              >
+                                Yesterday
+                              </Button>
+                            </div>
+                            <Calendar
+                              key={"submitted_at"}
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date > new Date() ||
+                                date < new Date("1900-01-01")
+                              }
+                              initialFocus
+                            />
+                          </PopoverClose>
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>
+                        Submitted cv or application date
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="tags"
                   render={({ field }) => (
                     <FormItem>
@@ -596,13 +668,15 @@ export function OpportunityForm({
                                 const existingLocation = locationsList.find(
                                   (skill) => skill.value === val
                                 );
-                                return existingLocation || { value: val, label: val };
+                                return (
+                                  existingLocation || { value: val, label: val }
+                                );
                               })}
                               onChange={(options: Option[]) => {
                                 field.onChange(
                                   options.map((option) => option.value)
                                 );
-                              }}                           
+                              }}
                               emptyIndicator={
                                 <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                   no results found.
@@ -728,7 +802,7 @@ export function OpportunityForm({
                       render={({ field }) => (
                         <FormItem className="flex flex-col pt-1">
                           <FormLabel>Published Date</FormLabel>
-                          <Popover>
+                          <Popover modal={true}>
                             <PopoverTrigger asChild>
                               <FormControl>
                                 <Button
@@ -752,70 +826,23 @@ export function OpportunityForm({
                               className="w-auto p-0"
                               align="start"
                             >
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date > new Date() ||
-                                  date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
+                              <PopoverClose>
+                                <Calendar
+                                  key={"published_at"}
+                                  mode="single"
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) =>
+                                    date > new Date() ||
+                                    date < new Date("1900-01-01")
+                                  }
+                                  initialFocus
+                                />
+                              </PopoverClose>
                             </PopoverContent>
                           </Popover>
                           <FormDescription>
                             Published date of the job posting
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="submitted_at"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col pt-1">
-                          <FormLabel>Submitted Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  disabled={isSubmitting || isGenAI}
-                                  variant={"outline"}
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "dd/MM/yyyy")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date > new Date() ||
-                                  date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormDescription>
-                            Submitted cv or application date
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
