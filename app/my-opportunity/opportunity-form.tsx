@@ -199,7 +199,7 @@ export function OpportunityForm({
 
   function extractValidUrlInput(input: string) {
     const urlRegex =
-      /\b(?:https?:\/\/)?(?:www\.)?[a-z0-9-]+\.[a-z]{2,}(?:\/[^\s]*)?/i;
+      /\b(?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/[^\s]*)*/gi;
     const match = input.match(urlRegex);
 
     if (!match) {
