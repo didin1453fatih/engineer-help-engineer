@@ -350,27 +350,27 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
       cell: ({ row }) => {
         const my_opportunity = row.original;
         return (
-          <>
+          <div className="flex md:items-center md:justify-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild className="w-fit">
                 <div>
                   <Button
                     variant="ghost"
-                    className="h-8 w-8 p-0 sm:block hidden mx-auto"
+                    className="h-8 w-8 p-0 md:block hidden"
                   >
                     <span className="sr-only">Open menu</span>
                     <MoreHorizontal height={20} />
                   </Button>
                   <Button
                     variant="default"
-                    className="w-auto sm:hidden"
+                    className="w-auto md:hidden"
                     size={"sm"}
                   >
                     Actions
                   </Button>
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" side="right">
+              <DropdownMenuContent align="end" side={window.innerWidth < 767 ? "right" : "bottom"}>
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() => {
@@ -407,7 +407,7 @@ export function DataTable({ data }: DataTableProps<MyOpportunity>) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </>
+          </div>
         );
       },
     },
