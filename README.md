@@ -10,7 +10,7 @@ Live at: [engineer-help-engineer.dynobird.com](https://engineer-help-engineer.dy
 ## Demo Video
 
 <a href="https://www.loom.com/share/23f828becb474232908567a34231d27d?sid=36c8a78f-369a-471f-9c8d-48893d9140f8">
-<img src="docs/demo_image.jpg"  width="200">
+<img src="docs/demo_image-portrait.png"  width="200">
 </a>
 
 ## 🚀 Project Overview
