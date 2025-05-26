@@ -42,6 +42,6 @@ Created after personal experience with layoffs (ex-Ruangguru engineer). Solves s
 - **Hosting**: Vercel
 - **Styling**: Tailwind CSS
 
-🌟 Future Roadmap
+## 🌟 Future Roadmap
 - [ ] **Public Opportunity Sharing**  
 - [ ] **Community Comment System**
