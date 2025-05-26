@@ -33,12 +33,16 @@ export async function GET(request: Request) {
     );
   }
 
-  const pageText = await axios.get(process.env.PUPPETER_SERVICE_URL, {
+  const { data: jobPageSummarizeCache, error } = await supabase.from("job_page_summarize_cache").select("*").eq("url", url).single()
+
+  if (jobPageSummarizeCache) {
+    return NextResponse.json({ data: jobPageSummarizeCache.llm_response }, { status: 200 });
+  }
+  var pageText = await axios.get(process.env.PUPPETER_SERVICE_URL, {
     params: {
       url: url,
     },
   })
-
 
 
   if (!process.env.GEMINI_API_KEY) {
@@ -100,18 +104,25 @@ export async function GET(request: Request) {
     contents,
   });
 
-
   if (!response.text || response.text.length < 10) {
     return NextResponse.json({ error: "No response from the model" }, { status: 500 });
   }
+
+
+  let parsedResponse = null
   try {
-    const parsedResponse = parseNestedJsonResponse(response.text);
-    return NextResponse.json({ data: parsedResponse }, { status: 200 });
+    parsedResponse = parseNestedJsonResponse(response.text);
   } catch (error) {
     return NextResponse.json({ error: "Failed to parse the response" }, { status: 500 });
   }
 
 
+  await supabase.from("job_page_summarize_cache").insert({
+    url: url,
+    llm_response: parsedResponse
+  })
+
+  return NextResponse.json({ data: parsedResponse }, { status: 200 });
 }
 
 
